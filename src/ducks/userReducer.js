@@ -1,23 +1,35 @@
 import axios from 'axios'
 
-// let REQUEST_USER_DATA =
-
-let requestUserData = () => {
-  let data = axios.get('/auth/user-data').then(res => res.data)
-  return {
-    type: REQUEST_USER_DATA,
-    payload: data,
-  }
-}
-
 const initialState = {
   email: null,
   firstName: null,
   lastName: null,
 }
 
-function reducer (state = initialState, action) {
-  return state
+const REQUEST_USER_DATA = 'REQUEST_USER_DATA'
+
+export const requestUserData = () => {
+  let data = axios
+    .get('/auth/user-data')
+    .then(res => res.data)
+    .catch(err => err.message)
+  return {
+    type: REQUEST_USER_DATA,
+    payload: data,
+  }
 }
 
-export default reducer
+export default function reducer (state = initialState, action) {
+  
+  switch (action.type) {
+    // case REQUEST_USER_DATA + '_Pending':
+    //   return {...state, loading: true}
+    case REQUEST_USER_DATA + '_FULFILLED':
+      let { email, firstName, lastName } = action.payload.user
+      return { ...state, email, firstName, lastName }
+    case REQUEST_USER_DATA + '_REJECTED':
+      return {...state, errorMessage: action.payload}
+    default:
+      return state
+  }
+}
